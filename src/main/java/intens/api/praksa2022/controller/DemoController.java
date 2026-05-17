@@ -15,6 +15,6 @@ public class DemoController {
     @RequestMapping("/hello")
     public ResponseEntity<String> getRootDemoHello() {
 
-        return ResponseEntity.ok().body("Hello world!");
+        return ResponseEntity.ok().body("Hello Intens Praksa 2022!");
     }
 }
