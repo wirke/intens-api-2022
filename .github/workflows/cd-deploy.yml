@@ -1,0 +1,31 @@
+name: cd deploy
+
+on:
+  push:
+    branches: [ master ]
+
+jobs:
+  build-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: get code
+      uses: actions/checkout@v4
+
+    - name: package application
+      run: mvn package -DskipTests
+
+    - name: login to docker
+      run: echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
+
+    - name: build docker image
+      run: docker build -t wirke/api-test:latest .
+
+    - name: push docker image
+      run: docker push wirke/api-test:latest
+
+    - name: reset image and run new container
+      run: |
+        docker stop api-test || true
+        docker rm api-test || true
+        docker run -d -p 8081:8081 -e PORT=8081 --name api-test wirke/api-test:latest
